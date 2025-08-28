@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentiment Analyzer | Futuristic UI</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Animate.css (you were using animate__ classes but this wasn’t included) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <!-- Tailwind CDN config (kept exactly as your theme) -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              neon: {
+                blue: '#00f2ff',
+                pink: '#ff00f2',
+                yellow: '#f2ff00',
+                purple: '#b400ff'
+              },
+              dark: {
+                900: '#0a0a0a',
+                800: '#1a1a1a',
+                700: '#2a2a2a'
+              }
+            },
+            animation: {
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4,0,0.6,1) infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'glow-blue': 'glow-blue 2s ease-in-out infinite alternate',
+              'glow-pink': 'glow-pink 2s ease-in-out infinite alternate',
+            },
+            keyframes: {
+              'float': {
+                '0%,100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' }
+              },
+              'glow-blue': {
+                from: { boxShadow: '0 0 5px #00f2ff, 0 0 10px #00f2ff' },
+                to:   { boxShadow: '0 0 15px #00f2ff, 0 0 30px #00f2ff' }
+              },
+              'glow-pink': {
+                from: { boxShadow: '0 0 5px #ff00f2, 0 0 10px #ff00f2' },
+                to:   { boxShadow: '0 0 15px #ff00f2, 0 0 30px #ff00f2' }
+              }
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+      /* No scroll – keep everything in one frame */
+      html, body { height: 100%; }
+      body {
+        font-family: 'Poppins', sans-serif;
+        background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+        color: white;
+        overflow: hidden; /* <- prevent vertical scrolling */
+      }
+
+      .glass {
+        background: rgba(26, 26, 26, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .title-text { font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px rgba(0,242,255,0.5); }
+      .neon-text-blue { text-shadow: 0 0 5px #00f2ff, 0 0 10px #00f2ff; }
+      .neon-text-pink { text-shadow: 0 0 5px #ff00f2, 0 0 10px #ff00f2; }
+      .neon-text-yellow { text-shadow: 0 0 5px #f2ff00, 0 0 10px #f2ff00; }
+
+      .gradient-text { background: linear-gradient(90deg,#00f2ff,#ff00f2); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+      .result-positive { animation: glow-blue 2s ease-in-out infinite alternate; border-color: #00f2ff; }
+      .result-negative { animation: glow-pink 2s ease-in-out infinite alternate; border-color: #ff00f2; }
+
+      .textarea-glow:focus { box-shadow: 0 0 10px rgba(0,242,255,0.5); border-color: #00f2ff; }
+      .btn-glow:hover { box-shadow: 0 0 15px rgba(0,242,255,0.7); }
+      .btn-gradient { background: linear-gradient(45deg,#00f2ff,#b400ff); transition: all .3s ease; }
+      .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,242,255,0.3); }
+      .emoji-float { animation: float 6s ease-in-out infinite; }
+
+      /* Compact adjustments to fit one screen */
+      .app-wrap { height: calc(100vh - 1rem); }     /* account for body padding */
+      textarea { resize: none; }                    /* prevent user from causing overflow */
+    </style>
+</head>
+
+<body class="flex flex-col items-center justify-center p-2">
+  <div class="max-w-4xl w-full mx-auto app-wrap flex flex-col">
+    <!-- Header (compact) -->
+    <header class="text-center mb-4 flex-none">
+      <h1 class="title-text text-3xl md:text-5xl font-bold mb-2 gradient-text">SENTIMENT ANALYZER</h1>
+      <p class="text-sm md:text-base text-gray-300 max-w-2xl mx-auto">
+        Discover the emotional tone behind any text with our AI-powered sentiment analysis
+      </p>
+    </header>
+
+    <!-- Main Content (compact) -->
+    <main class="glass rounded-2xl p-4 md:p-5 shadow-xl flex-none">
+      <!-- Input Section -->
+      <div class="mb-4">
+        <label for="review-text" class="block text-base font-medium mb-2 neon-text-blue">
+          <i class="fas fa-comment-alt mr-2"></i>Enter your review
+        </label>
+        <textarea
+          id="review-text"
+          rows="3"
+          class="w-full bg-dark-800 text-white textarea-glow rounded-xl p-3 border border-gray-700 focus:outline-none transition-all duration-300"
+          placeholder="Type or paste your review here..."></textarea>
+      </div>
+
+      <!-- Analyze Button -->
+      <div class="flex justify-center mb-4">
+        <button
+          id="analyze-btn"
+          class="btn-gradient text-white font-bold py-2 px-6 rounded-full text-base flex items-center btn-glow">
+          <i class="fas fa-brain mr-2"></i> ANALYZE SENTIMENT
+        </button>
+      </div>
+
+      <!-- Result Section -->
+      <div id="result-container" class="hidden">
+        <div class="text-center mb-2">
+          <h3 class="text-lg font-semibold text-gray-300">SENTIMENT RESULT</h3>
+        </div>
+
+        <div
+          id="result-card"
+          class="glass rounded-2xl p-4 md:p-5 border-2 flex flex-col md:flex-row items-center justify-between">
+          <div class="flex items-center mb-3 md:mb-0">
+            <div id="result-emoji" class="text-5xl md:text-6xl mr-4 emoji-float"></div>
+            <div>
+              <h2 id="result-text" class="text-xl md:text-2xl font-bold"></h2>
+              <p class="text-gray-400 text-sm">Sentiment Prediction</p>
+            </div>
+          </div>
+          <div class="text-center md:text-right">
+            <div class="text-xs text-gray-400 mb-1">Confidence Level</div>
+            <div id="confidence-meter" class="text-xl font-bold neon-text-yellow"></div>
+            <div class="w-40 bg-gray-800 rounded-full h-2 mt-2">
+              <div id="confidence-bar" class="h-2 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer (compact) -->
+    <footer class="text-center mt-3 text-gray-500 text-xs flex-none">
+      <p>AI-Powered Sentiment Analysis | © 2025 Futuristic Labs</p>
+    </footer>
+  </div>
+
+  <!-- Decorative Elements (kept) -->
+  <div class="fixed -left-20 -bottom-20 w-64 h-64 rounded-full bg-neon-blue opacity-10 blur-3xl -z-10"></div>
+  <div class="fixed -right-20 -top-20 w-64 h-64 rounded-full bg-neon-pink opacity-10 blur-3xl -z-10"></div>
+
+  <script>
+    const btn = document.getElementById('analyze-btn');
+    const resultContainer = document.getElementById('result-container');
+    const resultText = document.getElementById('result-text');
+    const resultEmoji = document.getElementById('result-emoji');
+    const confidenceMeter = document.getElementById('confidence-meter');
+    const confidenceBar = document.getElementById('confidence-bar');
+    const resultCard = document.getElementById('result-card');
+
+    btn.addEventListener('click', async function () {
+      const reviewText = document.getElementById('review-text').value.trim();
+      if (!reviewText) { alert('Please enter some text to analyze!'); return; }
+
+      // Loading state
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> ANALYZING...';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: reviewText })
+        });
+        const data = await response.json();
+
+        // Reset card styles before applying new state (prevents stacking)
+        resultCard.classList.remove('result-positive', 'result-negative');
+
+        if (data.sentiment === 'POSITIVE') {
+          resultText.textContent = 'POSITIVE';
+          resultText.className = 'text-xl md:text-2xl font-bold neon-text-blue';
+          resultEmoji.textContent = '😀';
+          resultCard.classList.add('result-positive');
+          confidenceBar.className = 'h-2 rounded-full bg-neon-blue';
+        } else {
+          resultText.textContent = 'NEGATIVE';
+          resultText.className = 'text-xl md:text-2xl font-bold neon-text-pink';
+          resultEmoji.textContent = '😡';
+          resultCard.classList.add('result-negative');
+          confidenceBar.className = 'h-2 rounded-full bg-neon-pink';
+        }
+
+        // Backend returns confidence in 0..1 — convert to %
+        const pct = Math.round((data.confidence || 0) * 100);
+        confidenceMeter.textContent = `${pct}%`;
+        confidenceBar.style.width = `${pct}%`;
+
+        resultContainer.classList.remove('hidden');
+        resultContainer.classList.add('animate__animated', 'animate__fadeIn');
+      } catch (err) {
+        console.error(err);
+        alert('Error connecting to backend API!');
+      }
+
+      // Restore button
+      btn.innerHTML = '<i class="fas fa-brain mr-2"></i> ANALYZE SENTIMENT';
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>
